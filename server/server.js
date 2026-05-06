@@ -41,16 +41,6 @@ const connection = new solanaWeb3.Connection(
   "confirmed"
 );
 
-// ==============================
-// 🧠 TEMP STORAGE (MVP)
-// ==============================
-
-const balances = {};
-const usedSignatures = new Set();
-
-global.balances = balances;
-global.usedSignatures = usedSignatures;
-
 // ⚠️ Vérifie ce chemin !
 const depositRoute = require("../deposit/confirm.cjs");
 app.use("/deposit", depositRoute);
@@ -59,12 +49,31 @@ app.use("/deposit", depositRoute);
 // 📡 ROUTES
 // ==============================
 
-app.get("/balance/:wallet", (req, res) => {
-  const wallet = req.params.wallet;
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-  res.json({
-    balance: balances[wallet] || 0
-  });
+app.get("/balance/:wallet", async (req, res) => {
+  try {
+
+    const wallet = req.params.wallet;
+
+    const user = await prisma.user.findUnique({
+      where: { wallet }
+    });
+
+    res.json({
+      balance: user?.balance || 0
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
 });
 
 // ==============================

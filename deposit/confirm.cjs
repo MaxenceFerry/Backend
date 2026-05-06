@@ -104,8 +104,20 @@ router.post("/confirm", async (req, res) => {
         }
       });
     } catch (e) {
-      return res.json({ success: false, error: "Already used" });
-    }
+  console.error("TRANSACTION CREATE ERROR:", e);
+
+  if (e.code === "P2002") {
+    return res.json({
+      success: false,
+      error: "Already used"
+    });
+  }
+
+  return res.json({
+    success: false,
+    error: "DB error"
+  });
+}
 
     // 💰 update balance (atomique)
     const updatedUser = await prisma.user.update({

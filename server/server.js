@@ -1,4 +1,6 @@
 require("dotenv").config();
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 const express = require("express");
 const cors = require("cors");
 const solanaWeb3 = require("@solana/web3.js");
